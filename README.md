@@ -9,6 +9,11 @@ Requires:
    * Graphviz
        * ubuntu: ``apt-get install graphviz``
        * others: download at [graphviz.org](graphviz.org)
+   * Ditaa
+       * ubuntu: ``apt-get install ditaa``
+       * others: download at [ditaa.sourceforge.net](ditaa.sourceforge.net)
+   * PlantUML
+       * download at [plantuml.sourceforge.net](plantuml.sourceforge.net)
    * Python-Markdown
        * ``easy_install Markdown``
 

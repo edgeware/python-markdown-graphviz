@@ -4,13 +4,15 @@
 Based on mdx_graphviz.py, see it for details.
 
 """
-import markdown
-import markdown.preprocessors
-import crcmod.predefined
-import os, re
+import os
+import re
 import shutil
 import subprocess
 import tempfile
+
+import crcmod.predefined
+import markdown
+import markdown.preprocessors
 
 
 class DitaaExtension(markdown.Extension):
@@ -37,10 +39,10 @@ class DitaaPreprocessor(markdown.preprocessors.Preprocessor):
 
     def __init__(self, ditaa):
         self.formatters = ["ditaa"]
-        self.ditaa    = ditaa
+        self.ditaa = ditaa
         self.start_re = re.compile(r'^<(%s)>' % '|'.join(self.formatters))
-        self.end_re   = re.compile(r'^</(%s)>' % '|'.join(self.formatters))
-        self.crc64    = lambda x: crcmod.predefined.mkCrcFun('crc-64')(x)
+        self.end_re = re.compile(r'^</(%s)>' % '|'.join(self.formatters))
+        self.crc64 = lambda x: crcmod.predefined.mkCrcFun('crc-64')(x)
 
     def run(self, lines):
         new_lines = []
@@ -48,7 +50,7 @@ class DitaaPreprocessor(markdown.preprocessors.Preprocessor):
         in_block = None
         for line in lines:
             start_tag = self.start_re.match(line)
-            end_tag   = self.end_re.match(line)
+            end_tag = self.end_re.match(line)
             if start_tag:
                 assert(block == [])
                 in_block = start_tag.group(1)
@@ -85,7 +87,8 @@ class DitaaPreprocessor(markdown.preprocessors.Preprocessor):
             p.wait()
             shutil.copyfile(tmp.name + ".png", filepath)
 
-        output_path = "%s%s.png" % (self.ditaa.config["BASE_IMG_LINK_DIR"], name)
+        output_path = "%s%s.png" % (self.ditaa.config["BASE_IMG_LINK_DIR"],
+                                    name)
         return "![Ditaa chart %s](%s)" % (name, output_path)
 
 

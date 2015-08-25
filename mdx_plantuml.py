@@ -4,19 +4,25 @@
 Based on mdx_graphviz.py, see it for details.
 
 """
-import markdown
-import markdown.preprocessors
-import crcmod.predefined
-import os, re
+import os
+import re
 import shutil
 import subprocess
 import tempfile
 
+import crcmod.predefined
+import markdown
+import markdown.preprocessors
+
 
 class PlantUMLExtension(markdown.Extension):
     def __init__(self, configs):
-        self.config = {'BINARY_PATH': "", 'WRITE_IMGS_DIR': "",
-                       "BASE_IMG_LINK_DIR": "", "ARGUMENTS": ""}
+        self.config = {
+            'BINARY_PATH': "",
+            'WRITE_IMGS_DIR': "",
+            "BASE_IMG_LINK_DIR": "",
+            "ARGUMENTS": ""
+        }
         for key, value in configs:
             self.config[key] = value
 
@@ -39,8 +45,8 @@ class PlantUMLPreprocessor(markdown.preprocessors.Preprocessor):
         self.formatters = ["plantuml"]
         self.plantuml = plantuml
         self.start_re = re.compile(r'^<(%s)>' % '|'.join(self.formatters))
-        self.end_re   = re.compile(r'^</(%s)>' % '|'.join(self.formatters))
-        self.crc64    = lambda x: crcmod.predefined.mkCrcFun('crc-64')(x)
+        self.end_re = re.compile(r'^</(%s)>' % '|'.join(self.formatters))
+        self.crc64 = lambda x: crcmod.predefined.mkCrcFun('crc-64')(x)
 
     def run(self, lines):
         new_lines = []
@@ -48,9 +54,9 @@ class PlantUMLPreprocessor(markdown.preprocessors.Preprocessor):
         in_block = None
         for line in lines:
             start_tag = self.start_re.match(line)
-            end_tag   = self.end_re.match(line)
+            end_tag = self.end_re.match(line)
             if start_tag:
-                assert(block == [])
+                assert (block == [])
                 in_block = start_tag.group(1)
             elif end_tag:
                 new_lines.append(self.graph(in_block, block))
@@ -60,7 +66,7 @@ class PlantUMLPreprocessor(markdown.preprocessors.Preprocessor):
                 block.append(line)
             else:
                 new_lines.append(line)
-        assert(block == [])
+        assert (block == [])
         return new_lines
 
     def graph(self, kind, lines):
@@ -71,7 +77,7 @@ class PlantUMLPreprocessor(markdown.preprocessors.Preprocessor):
         code = "\n".join(lines)
         name = self.crc64(code)
 
-        assert(kind in self.formatters)
+        assert (kind in self.formatters)
         filepath = "%s%s.png" % (self.plantuml.config["WRITE_IMGS_DIR"], name)
         if not os.path.exists(filepath):
             tmp = tempfile.NamedTemporaryFile()
@@ -80,12 +86,16 @@ class PlantUMLPreprocessor(markdown.preprocessors.Preprocessor):
             cmd = "%s %s %s" % (
                 os.path.join(self.plantuml.config["BINARY_PATH"], kind),
                 self.plantuml.config["ARGUMENTS"], tmp.name)
-            p = subprocess.Popen(cmd, shell=True, stdin=subprocess.PIPE,
-                                 stdout=subprocess.PIPE, close_fds=True)
+            p = subprocess.Popen(cmd,
+                                 shell=True,
+                                 stdin=subprocess.PIPE,
+                                 stdout=subprocess.PIPE,
+                                 close_fds=True)
             p.wait()
             shutil.copyfile(tmp.name, filepath)
 
-        output_path = "%s%s.png" % (self.plantuml.config["BASE_IMG_LINK_DIR"], name)
+        output_path = "%s%s.png" % (self.plantuml.config["BASE_IMG_LINK_DIR"],
+                                    name)
         return "![PlantUML chart %s](%s)" % (name, output_path)
 
 

@@ -1,13 +1,8 @@
-# Test
+# Graphviz example
 
 <dot>
 digraph a {
 	a -> b;
 }
 </dot>
-
-* a
-* b
-* c
-
 
